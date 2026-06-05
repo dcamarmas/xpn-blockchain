@@ -5,7 +5,8 @@
 
 id="$1"
 i=1
-endTime=$(($(date +%s) + 120)) #120 seconds generating data. Adjust to desired value
+#endTime=$(($(date +%s) + 120)) #120 seconds generating data. Adjust to desired value
+endTime=$(($(date +%s) + 43200)) #120 seconds generating data. Adjust to desired value
 
 while [ $(date +%s) -lt $endTime ]; do
 
@@ -22,7 +23,7 @@ while [ $(date +%s) -lt $endTime ]; do
     fi
 
     echo $rtDataCommand
-    eval $rtDataCommand
+    time eval $rtDataCommand
     #curl -X POST -H "Content-Type: application/json" -d "{\"id\": \"$id\", \"oxygenSaturation\": \"$oxygenSaturation\", \"pulseRate\": \"$pulseRate\", \"temperature\": \"$temperature\", \"bloodPressureSystolic\": \"$bloodPressureSystolic\", \"bloodPressureDiastolic\": \"$bloodPressureDiastolic\"}" http://localhost:4000/patients/$id/real-time-data
 
     i=$((i+1))

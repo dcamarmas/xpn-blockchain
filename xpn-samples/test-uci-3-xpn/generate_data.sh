@@ -5,7 +5,8 @@
 
 patient_id="$1"
 i=1
-endTime=$(($(date +%s) + 120)) #120 seconds generating data. Adjust to desired value
+#endTime=$(($(date +%s) + 120)) #120 seconds generating data. Adjust to desired value
+endTime=$(($(date +%s) + 43200)) #120 seconds generating data. Adjust to desired value
 
 while [ $(date +%s) -lt $endTime ]; do
 
@@ -24,11 +25,13 @@ while [ $(date +%s) -lt $endTime ]; do
         echo $((transaction_id+1)) > "$TRANSACTION_ID"
     } 200>"$LOCK_FILE"
 
-    #export XPN_CONF=$HOME/dcamarma/tmp/config.${SLURM_JOBID}.xml
-    #file_hash=$(LD_PRELOAD=$HOME/dcamarma/bin/xpn/lib/xpn_bypass.so python3 write_data_xpn.py /tmp/expand/xpn/$patient_id/vital_signs\_$i.txt "{\"id\":\"1\", \"patientId\":\"$patient_id\", \"oxygenSaturation\":\"$oxygenSaturation\", \"pulseRate\":\"$pulseRate\", \"temperature\":\"$temperature\", \"bloodPressureSystolic\":\"$bloodPressureSystolic\", \"bloodPressureDiastolic\":\"$bloodPressureDiastolic\"}")
-    file_hash=$(python3 write_data_xpn.py /tmp/expand/xpn/$patient_id/vital_signs\_$i.txt "{\"id\":\"$transaction_id\", \"patientId\":\"$patient_id\", \"oxygenSaturation\":\"$oxygenSaturation\", \"pulseRate\":\"$pulseRate\", \"temperature\":\"$temperature\", \"bloodPressureSystolic\":\"$bloodPressureSystolic\", \"bloodPressureDiastolic\":\"$bloodPressureDiastolic\"}")
+    time {
+        file_hash=$(LD_PRELOAD=$HOME/bin/xpn/lib/xpn_bypass.so python3 write_data_xpn.py /tmp/expand/xpn/$patient_id/vital_signs\_$i.txt "{\"id\":\"1\", \"patientId\":\"$patient_id\", \"oxygenSaturation\":\"$oxygenSaturation\", \"pulseRate\":\"$pulseRate\", \"temperature\":\"$temperature\", \"bloodPressureSystolic\":\"$bloodPressureSystolic\", \"bloodPressureDiastolic\":\"$bloodPressureDiastolic\"}")
+        
+        #file_hash=$(python3 write_data_xpn.py /tmp/expand/xpn/$patient_id/vital_signs\_$i.txt "{\"id\":\"$transaction_id\", \"patientId\":\"$patient_id\", \"oxygenSaturation\":\"$oxygenSaturation\", \"pulseRate\":\"$pulseRate\", \"temperature\":\"$temperature\", \"bloodPressureSystolic\":\"$bloodPressureSystolic\", \"bloodPressureDiastolic\":\"$bloodPressureDiastolic\"}")
 
-    peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls --cafile "${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem" -C mychannel -n basic --peerAddresses localhost:7051 --tlsRootCertFiles "${PWD}/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt" --peerAddresses localhost:9051 --tlsRootCertFiles "${PWD}/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt" -c "{\"function\":\"CreateXpnTransaction\",\"Args\":[\"$transaction_id\", \"$file_hash\", \"/tmp/expand/xpn/$patient_id/vital_signs_$i.txt\"]}"
+        peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls --cafile "${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem" -C mychannel -n basic --peerAddresses localhost:7051 --tlsRootCertFiles "${PWD}/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt" --peerAddresses localhost:9051 --tlsRootCertFiles "${PWD}/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt" -c "{\"function\":\"CreateXpnTransaction\",\"Args\":[\"$transaction_id\", \"$file_hash\", \"/tmp/expand/xpn/$patient_id/vital_signs_$i.txt\"]}"
+    }
 
     i=$((i+1))
 
